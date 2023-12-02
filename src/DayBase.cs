@@ -1,7 +1,9 @@
 ﻿using AdventOfCode2023.Utility;
+using BenchmarkDotNet.Attributes;
 
 namespace AdventOfCode2023
 {
+    [MemoryDiagnoser]
     public abstract class DayBase
     {
         protected abstract string Day { get; }
@@ -17,6 +19,24 @@ namespace AdventOfCode2023
                 : PartTwoInputAsStream ? PartTwoAsync(GetInputStream()) : PartTwoAsync(GetInput());
         }
 
+        [Benchmark]
+        public async Task RunPartOneBenchmark()
+        {
+            if (PartOneInputAsStream)
+                await PartOneAsync(GetInputStream());
+            else
+                await PartOneAsync(GetInput());
+        }
+
+        [Benchmark]
+        public async Task RunPartTwoBenchmark()
+        {
+            if (PartTwoInputAsStream)
+                await PartTwoAsync(GetInputStream());
+            else
+                await PartTwoAsync(GetInput());
+        }
+
 #pragma warning disable IDE0022 // Use block body for methods
         protected virtual Task<string> PartOneAsync(string input) => throw new NotImplementedException();
         protected virtual Task<string> PartOneAsync(FileStream inputStream) => throw new NotImplementedException();
@@ -26,11 +46,11 @@ namespace AdventOfCode2023
 
         protected string GetInput()
         {
-            return InputLoader.LoadInputsFromFileAsString($"InputFiles/Day{Day}.txt");
+            return InputLoader.LoadInputsFromFileAsString($"InputFiles/Day{Day}.txt", false);
         }
         protected FileStream GetInputStream()
         {
-            return InputLoader.LoadInputsAsFileStream($"InputFiles/Day{Day}.txt");
+            return InputLoader.LoadInputsAsFileStream($"InputFiles/Day{Day}.txt", false);
         }
     }
 

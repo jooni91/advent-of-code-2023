@@ -1,5 +1,10 @@
 ﻿# Day 1: Trebuchet?!
 
+### Benchmark
+| Method              | Mean       | Error    | StdDev   | Gen0     | Allocated  |
+|-------------------- |-----------:|---------:|---------:|---------:|-----------:|
+| RunPartOneBenchmark |   773.8 μs |  7.84 μs |  7.33 μs |  87.8906 |  270.77 KB |
+| RunPartTwoBenchmark | 2,619.7 μs | 40.23 μs | 37.63 μs | 500.0000 | 1536.07 KB |
 
 ### Personal Stats for the Day
 **Part 1**
@@ -13,7 +18,6 @@
  Time                  | Rank | Score 
 -----------------------|------|-------
   07:01:53             | 34960 | 0     
-
 
 ## Part 1
 Something is wrong with global snow production, and you've been selected to take a look. The Elves have even given you a map; on it, they've used stars to mark the top fifty locations that are likely to be having problems.

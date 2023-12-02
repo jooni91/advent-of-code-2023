@@ -9,13 +9,15 @@ namespace AdventOfCode2023.Utility
         /// </summary>
         /// <param name="filePath">The relative path to a file.</param>
         /// <returns></returns>
-        public static FileStream LoadInputsAsFileStream(string filePath)
+        public static FileStream LoadInputsAsFileStream(string filePath, bool loggingEnabled = true)
         {
-            Console.WriteLine("Started opening file stream.");
+            if (loggingEnabled)
+                Console.WriteLine("Started opening file stream.");
 
             var result = File.OpenRead(filePath);
 
-            Console.WriteLine($"Opened file stream of file {filePath}.");
+            if (loggingEnabled)
+                Console.WriteLine($"Opened file stream of file {filePath}.");
 
             return result;
         }
@@ -25,13 +27,15 @@ namespace AdventOfCode2023.Utility
         /// </summary>
         /// <param name="filePath">The relative path to a file.</param>
         /// <returns></returns>
-        public static string LoadInputsFromFileAsString(string filePath)
+        public static string LoadInputsFromFileAsString(string filePath, bool loggingEnabled = true)
         {
-            Console.WriteLine("Started loading inputs from file.");
+            if (loggingEnabled)
+                Console.WriteLine("Started loading inputs from file.");
 
             var result = File.ReadAllText(filePath);
 
-            Console.WriteLine($"Loaded inputs from file {filePath}.");
+            if (loggingEnabled)
+                Console.WriteLine($"Loaded inputs from file {filePath}.");
 
             return result;
         }
@@ -77,14 +81,15 @@ namespace AdventOfCode2023.Utility
         /// </summary>
         /// <param name="inputs"></param>
         /// <returns></returns>
-        public static IEnumerable<int> ConvertInputsToIntegers(this string inputs)
+        public static IEnumerable<int> ConvertInputsToIntegers(this string inputs, bool loggingEnabled = false)
         {
             foreach (var s in inputs)
             {
                 yield return Convert.ToInt32(s.ToString());
             }
 
-            Console.WriteLine("Converted inputs to integer values.");
+            if (loggingEnabled)
+                Console.WriteLine("Converted inputs to integer values.");
         }
 
         /// <summary>
@@ -92,14 +97,15 @@ namespace AdventOfCode2023.Utility
         /// </summary>
         /// <param name="inputs"></param>
         /// <returns></returns>
-        public static IEnumerable<int> ConvertInputsToIntegers(this string[] inputs)
+        public static IEnumerable<int> ConvertInputsToIntegers(this string[] inputs, bool loggingEnabled = false)
         {
             foreach (var s in inputs)
             {
                 yield return Convert.ToInt32(s);
             }
 
-            Console.WriteLine("Converted inputs to integer values.");
+            if (loggingEnabled)
+                Console.WriteLine("Converted inputs to integer values.");
         }
 
         /// <summary>
@@ -107,14 +113,15 @@ namespace AdventOfCode2023.Utility
         /// </summary>
         /// <param name="inputs"></param>
         /// <returns></returns>
-        public static IEnumerable<int> ConvertInputsToIntegers(this IEnumerable<string> inputs)
+        public static IEnumerable<int> ConvertInputsToIntegers(this IEnumerable<string> inputs, bool loggingEnabled = false)
         {
             foreach (var s in inputs)
             {
                 yield return Convert.ToInt32(s);
             }
 
-            Console.WriteLine("Converted inputs to integer values.");
+            if (loggingEnabled)
+                Console.WriteLine("Converted inputs to integer values.");
         }
 
         /// <summary>
@@ -122,14 +129,15 @@ namespace AdventOfCode2023.Utility
         /// </summary>
         /// <param name="inputs"></param>
         /// <returns></returns>
-        public static IEnumerable<long> ConvertInputsToLongs(this string[] inputs)
+        public static IEnumerable<long> ConvertInputsToLongs(this string[] inputs, bool loggingEnabled = false)
         {
             foreach (var s in inputs)
             {
                 yield return Convert.ToInt64(s);
             }
 
-            Console.WriteLine("Converted inputs to long values.");
+            if (loggingEnabled)
+                Console.WriteLine("Converted inputs to long values.");
         }
 
         /// <summary>
@@ -137,14 +145,15 @@ namespace AdventOfCode2023.Utility
         /// </summary>
         /// <param name="inputs"></param>
         /// <returns></returns>
-        public static IEnumerable<long> ConvertInputsToLongs(this IEnumerable<string> inputs)
+        public static IEnumerable<long> ConvertInputsToLongs(this IEnumerable<string> inputs, bool loggingEnabled = false)
         {
             foreach (var s in inputs)
             {
                 yield return Convert.ToInt64(s);
             }
 
-            Console.WriteLine("Converted inputs to long values.");
+            if (loggingEnabled)
+                Console.WriteLine("Converted inputs to long values.");
         }
 
         /// <summary>
@@ -152,14 +161,15 @@ namespace AdventOfCode2023.Utility
         /// </summary>
         /// <param name="inputs"></param>
         /// <returns></returns>
-        public static IEnumerable<int> ConvertInputsToIntegers(this char[] inputs)
+        public static IEnumerable<int> ConvertInputsToIntegers(this char[] inputs, bool loggingEnabled = false)
         {
             foreach (var s in inputs)
             {
                 yield return Convert.ToInt32(s);
             }
 
-            Console.WriteLine("Converted inputs to integer values.");
+            if (loggingEnabled)
+                Console.WriteLine("Converted inputs to long values.");
         }
 
         /// <summary>
