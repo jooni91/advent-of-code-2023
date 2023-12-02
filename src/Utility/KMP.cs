@@ -33,7 +33,64 @@
 
             return indices;
         }
+        public static List<int> SearchAllIndieces(ReadOnlySpan<char> source, ReadOnlySpan<char> match)
+        {
+            List<int> indices = new();
+            int sourceIndex = 0;
+            int matchIndex = 0;
+            int[] failure = ComputeFailure(match);
 
+            while (sourceIndex < source.Length)
+            {
+                if (matchIndex < match.Length && match[matchIndex] == source[sourceIndex])
+                {
+                    matchIndex++;
+                    if (matchIndex == match.Length)
+                    {
+                        indices.Add(sourceIndex - match.Length + 1);
+                        matchIndex = failure[matchIndex - 1];
+                    }
+                    sourceIndex++;
+                }
+                else if (matchIndex > 0)
+                {
+                    matchIndex = failure[matchIndex - 1];
+                }
+                else
+                {
+                    sourceIndex++;
+                }
+            }
+
+            return indices;
+        }
+        public static List<int> SearchAllIndieces(ReadOnlySpan<char> source, char delimiter)
+        {
+            return SearchAllIndieces(source, delimiter.ToString().AsSpan());
+        }
+
+        private static int[] ComputeFailure(ReadOnlySpan<char> pattern)
+        {
+            int[] failure = new int[pattern.Length];
+            int j = 0;
+
+            for (int i = 1; i < pattern.Length; i++)
+            {
+                while (j > 0 && pattern[i] != pattern[j])
+                {
+                    j = failure[j - 1];
+                }
+
+                if (pattern[i] == pattern[j])
+                {
+                    j++;
+                }
+
+                failure[i] = j;
+            }
+
+            return failure;
+        }
         private static int[] ComputeFailure(string pattern)
         {
             int[] failure = new int[pattern.Length];
