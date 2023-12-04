@@ -25,3 +25,5 @@ Intel Xeon CPU E31225 3.10GHz, 1 CPU, 4 logical and 4 physical cores
 - [Day 2: Cube Conundrum](https://github.com/jooni91/advent-of-code-2023/tree/master/src/Solutions/Day02)
 
 - [Day 3: Gear Ratios](https://github.com/jooni91/advent-of-code-2023/tree/master/src/Solutions/Day03)
+
+- [Day 4: Scratchcards](https://github.com/jooni91/advent-of-code-2023/tree/master/src/Solutions/Day04)
