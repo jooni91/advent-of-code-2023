@@ -1,10 +1,10 @@
 ﻿# Day 4: Scratchcards
 
 ### Benchmark
-| Method              | Mean     | Error   | StdDev  | Gen0    | Allocated |
-|-------------------- |---------:|--------:|--------:|--------:|----------:|
-| RunPartOneBenchmark | 683.7 μs | 3.82 μs | 3.57 μs | 26.3672 |  79.15 KB |
-| RunPartTwoBenchmark | 715.1 μs | 4.96 μs | 4.40 μs | 28.3203 |   85.3 KB |
+| Method              | Mean     | Error   | StdDev  | Allocated |
+|-------------------- |---------:|--------:|--------:|----------:|
+| RunPartOneBenchmark | 207.3 μs | 2.26 μs | 2.11 μs |     104 B |
+| RunPartTwoBenchmark | 180.5 μs | 2.09 μs | 1.96 μs |     112 B |
 
 ### Personal Stats for the Day
 **Part 1**

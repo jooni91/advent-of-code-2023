@@ -1,10 +1,10 @@
 ﻿# Day 2: Cube Conundrum
 
 ### Benchmark
-| Method              | Mean     | Error   | StdDev  | Gen0    | Allocated |
-|-------------------- |---------:|--------:|--------:|--------:|----------:|
-| RunPartOneBenchmark | 528.7 μs | 5.81 μs | 4.85 μs | 31.2500 |  96.03 KB |
-| RunPartTwoBenchmark | 555.0 μs | 5.93 μs | 5.55 μs | 37.1094 | 113.29 KB |
+| Method              | Mean     | Error    | StdDev   | Allocated |
+|-------------------- |---------:|---------:|---------:|----------:|
+| RunPartOneBenchmark | 65.76 μs | 0.553 μs | 0.517 μs |     104 B |
+| RunPartTwoBenchmark | 72.36 μs | 0.947 μs | 0.885 μs |     104 B |
 
 ### Personal Stats for the Day
 **Part 1**

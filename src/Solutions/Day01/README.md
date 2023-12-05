@@ -1,10 +1,10 @@
 ﻿# Day 1: Trebuchet?!
 
 ### Benchmark
-| Method              | Mean       | Error    | StdDev   | Gen0     | Allocated  |
-|-------------------- |-----------:|---------:|---------:|---------:|-----------:|
-| RunPartOneBenchmark |   773.8 μs |  7.84 μs |  7.33 μs |  87.8906 |  270.77 KB |
-| RunPartTwoBenchmark | 2,619.7 μs | 40.23 μs | 37.63 μs | 500.0000 | 1536.07 KB |
+| Method              | Mean     | Error    | StdDev  | Allocated |
+|-------------------- |---------:|---------:|--------:|----------:|
+| RunPartOneBenchmark | 119.5 μs |  0.57 μs | 0.51 μs |     104 B |
+| RunPartTwoBenchmark | 957.0 μs | 10.51 μs | 9.83 μs |     104 B |
 
 ### Personal Stats for the Day
 **Part 1**
