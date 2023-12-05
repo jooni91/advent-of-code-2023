@@ -1,5 +1,6 @@
 ﻿using AdventOfCode2023.Utility;
 using BenchmarkDotNet.Attributes;
+using System.Text;
 
 namespace AdventOfCode2023
 {
@@ -7,50 +8,79 @@ namespace AdventOfCode2023
     public abstract class DayBase
     {
         protected abstract string Day { get; }
-        protected virtual bool PartOneInputAsStream { get; } = false;
-        protected virtual bool PartTwoInputAsStream { get; } = false;
 
         public bool UnitTestMode { get; set; } = false;
 
         public Task<string> GetResultAsync(Part part)
         {
             return part == Part.One
-                ? PartOneInputAsStream ? PartOneAsync(GetInputStream()) : PartOneAsync(GetInput())
-                : PartTwoInputAsStream ? PartTwoAsync(GetInputStream()) : PartTwoAsync(GetInput());
+                ? PartOneAsync(GetInputStream())
+                : PartTwoAsync(GetInputStream());
         }
 
         [Benchmark]
         public async Task RunPartOneBenchmark()
         {
-            if (PartOneInputAsStream)
-                await PartOneAsync(GetInputStream());
-            else
-                await PartOneAsync(GetInput());
+            await PartOneAsync(GetInputStream());
         }
 
         [Benchmark]
         public async Task RunPartTwoBenchmark()
         {
-            if (PartTwoInputAsStream)
-                await PartTwoAsync(GetInputStream());
-            else
-                await PartTwoAsync(GetInput());
+            await PartTwoAsync(GetInputStream());
         }
 
-#pragma warning disable IDE0022 // Use block body for methods
-        protected virtual Task<string> PartOneAsync(string input) => throw new NotImplementedException();
-        protected virtual Task<string> PartOneAsync(FileStream inputStream) => throw new NotImplementedException();
-        protected virtual Task<string> PartTwoAsync(string input) => throw new NotImplementedException();
-        protected virtual Task<string> PartTwoAsync(FileStream inputStream) => throw new NotImplementedException();
-#pragma warning restore IDE0022 // Use block body for methods
-
-        protected string GetInput()
+        protected virtual async Task<string> PartOneAsync(FileStream input)
         {
-            return InputLoader.LoadInputsFromFileAsString($"InputFiles/Day{Day}.txt", false);
+            int bufferSize = CalculateBufferSize(new FileInfo($"InputFiles/Day{Day}.txt").Length);
+            char[] buffer = new char[bufferSize];
+
+            using (StreamReader reader = new(input, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: bufferSize, leaveOpen: true))
+            {
+                int bytesRead = await reader.ReadAsync(buffer, 0, buffer.Length);
+                return await PartOneAsync(buffer.AsMemory(0, bytesRead));
+            }
         }
+        protected virtual Task<string> PartOneAsync(ReadOnlyMemory<char> input)
+        {
+            return PartOneAsync(input.ToString());
+        }
+        protected virtual Task<string> PartOneAsync(string input)
+        {
+            throw new NotImplementedException();
+        }
+        protected virtual async Task<string> PartTwoAsync(FileStream input)
+        {
+            int bufferSize = CalculateBufferSize(new FileInfo($"InputFiles/Day{Day}.txt").Length);
+            char[] buffer = new char[bufferSize];
+
+            using (StreamReader reader = new(input, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: bufferSize, leaveOpen: true))
+            {
+                int bytesRead = await reader.ReadAsync(buffer, 0, buffer.Length);
+                return await PartTwoAsync(buffer.AsMemory(0, bytesRead));
+            }
+        }
+        protected virtual Task<string> PartTwoAsync(ReadOnlyMemory<char> input)
+        {
+            return PartTwoAsync(input.ToString());
+        }
+        protected virtual Task<string> PartTwoAsync(string input)
+        {
+            throw new NotImplementedException();
+        }
+
         protected FileStream GetInputStream()
         {
             return InputLoader.LoadInputsAsFileStream($"InputFiles/Day{Day}.txt", false);
+        }
+
+        static int CalculateBufferSize(long fileSize)
+        {
+            const int minBufferSize = 1024;
+
+            int bufferSize = (int)Math.Min(fileSize, int.MaxValue);
+
+            return Math.Max(bufferSize, minBufferSize);
         }
     }
 

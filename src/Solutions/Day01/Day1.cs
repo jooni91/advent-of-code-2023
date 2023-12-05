@@ -20,8 +20,6 @@ namespace AdventOfCode2023.Solutions.Day01
         };
 
         protected override string Day => "01";
-        protected override bool PartOneInputAsStream { get; } = true;
-        protected override bool PartTwoInputAsStream { get; } = true;
 
         protected override async Task<string> PartOneAsync(FileStream inputStream)
         {

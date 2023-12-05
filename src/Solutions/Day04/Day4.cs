@@ -1,4 +1,5 @@
 ﻿using AdventOfCode2023.Extensions;
+using AdventOfCode2023.Utility;
 using System.Diagnostics.CodeAnalysis;
 
 namespace AdventOfCode2023.Solutions.Day04
@@ -6,50 +7,49 @@ namespace AdventOfCode2023.Solutions.Day04
     public class Day4 : DayBase
     {
         protected override string Day { get; } = "04";
-        protected override bool PartOneInputAsStream { get; } = true;
-        protected override bool PartTwoInputAsStream { get; } = true;
 
-        protected override async Task<string> PartOneAsync(FileStream inputStream)
+        protected override Task<string> PartOneAsync(ReadOnlyMemory<char> input)
         {
             var points = 0;
 
-            await foreach (var line in inputStream.ReadLineAsync())
+            foreach (var line in new MemoryLineEnumerator(input))
             {
                 var count = CountWinningNumbers(line);
 
                 points += count > 0 ? 1 << (count - 1) : 0;
             }
 
-            return points.ToString();
+            return Task.FromResult(points.ToString());
         }
-        protected override async Task<string> PartTwoAsync(FileStream inputStream)
+        protected override Task<string> PartTwoAsync(ReadOnlyMemory<char> input)
         {
-            var input = await inputStream.ReadLineAsync().ToArrayAsync();
-
-            return CalculateScratchCardCount(ref input).ToString();
+            return Task.FromResult(CalculateScratchCardCount(input).ToString());
         }
 
-        private static int CalculateScratchCardCount(ref string[] input)
+        private static int CalculateScratchCardCount(ReadOnlyMemory<char> input)
         {
-            Span<int> scratchcardCount = stackalloc int[input.Length];
+            Span<int> scratchcardCount = stackalloc int[214];
+            var scratchcardIndex = 0;
 
-            for (int i = 0; i < input.Length; i++)
+            foreach (var line in new MemoryLineEnumerator(input))
             {
-                var winningNumberCount = CountWinningNumbers(input[i]);
+                var winningNumberCount = CountWinningNumbers(line);
 
-                scratchcardCount[i]++;
+                scratchcardCount[scratchcardIndex]++;
 
                 for (int j = 1; j <= winningNumberCount; j++)
                 {
-                    var index = i + j;
+                    var index = scratchcardIndex + j;
 
                     if (index > scratchcardCount.Length)
                     {
                         break;
                     }
 
-                    scratchcardCount[index] += 1 * scratchcardCount[i];
+                    scratchcardCount[index] += 1 * scratchcardCount[scratchcardIndex];
                 }
+
+                scratchcardIndex++;
             }
 
             var count = 0;
@@ -61,15 +61,15 @@ namespace AdventOfCode2023.Solutions.Day04
 
             return count;
         }
-        private static int CountWinningNumbers(string line)
+        private static int CountWinningNumbers(ReadOnlyMemory<char> line)
         {
-            var gameDataSpan = line.AsSpan()[9..];
-            var pipeIndex = gameDataSpan.IndexOf('|');
+            var gameDataSpan = line[9..];
+            var pipeIndex = gameDataSpan.Span.IndexOf('|');
             Span<int> winningNumbers = stackalloc int[10];
             Span<int> drawnNumbers = stackalloc int[25];
 
-            ExtractNumbers(gameDataSpan[..pipeIndex], ref winningNumbers);
-            ExtractNumbers(gameDataSpan[(pipeIndex + 1)..], ref drawnNumbers);
+            ExtractNumbers(gameDataSpan.Span[..pipeIndex], ref winningNumbers);
+            ExtractNumbers(gameDataSpan.Span[(pipeIndex + 1)..], ref drawnNumbers);
 
             var count = 0;
 
