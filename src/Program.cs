@@ -55,7 +55,7 @@ internal class Program
     {
         var dayType = Assembly.GetAssembly(typeof(DayBase))!.GetType($"AdventOfCode2023.Solutions.Day{(args[0].Length == 1 ? "0" : "")}{args[0]}.Day{args[0]}");
 
-        BenchmarkRunner.Run(dayType!);
+        BenchmarkRunner.Run(typeof(BenchmarkWrapper<>).MakeGenericType(dayType!));
 
         await RestartOrExit();
     }

@@ -7,7 +7,7 @@ namespace AdventOfCode2023
     [MemoryDiagnoser]
     public abstract class DayBase
     {
-        protected abstract string Day { get; }
+        public abstract string Day { get; }
 
         public bool UnitTestMode { get; set; } = false;
 
@@ -18,16 +18,13 @@ namespace AdventOfCode2023
                 : PartTwoAsync(GetInputStream());
         }
 
-        [Benchmark]
-        public async Task RunPartOneBenchmark()
+        public async Task RunPartOneBenchmark(ReadOnlyMemory<char> input)
         {
-            await PartOneAsync(GetInputStream());
+            await PartOneAsync(input);
         }
-
-        [Benchmark]
-        public async Task RunPartTwoBenchmark()
+        public async Task RunPartTwoBenchmark(ReadOnlyMemory<char> input)
         {
-            await PartTwoAsync(GetInputStream());
+            await PartTwoAsync(input);
         }
 
         protected virtual async Task<string> PartOneAsync(FileStream input)
@@ -35,11 +32,11 @@ namespace AdventOfCode2023
             int bufferSize = CalculateBufferSize(new FileInfo($"InputFiles/Day{Day}.txt").Length);
             char[] buffer = new char[bufferSize];
 
-            using (StreamReader reader = new(input, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: bufferSize, leaveOpen: true))
-            {
-                int bytesRead = await reader.ReadAsync(buffer, 0, buffer.Length);
-                return await PartOneAsync(buffer.AsMemory(0, bytesRead));
-            }
+            using StreamReader reader = new(input, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: bufferSize, leaveOpen: true);
+
+            int bytesRead = await reader.ReadAsync(buffer, 0, buffer.Length);
+
+            return await PartOneAsync(buffer.AsMemory(0, bytesRead));
         }
         protected virtual Task<string> PartOneAsync(ReadOnlyMemory<char> input)
         {
@@ -54,11 +51,11 @@ namespace AdventOfCode2023
             int bufferSize = CalculateBufferSize(new FileInfo($"InputFiles/Day{Day}.txt").Length);
             char[] buffer = new char[bufferSize];
 
-            using (StreamReader reader = new(input, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: bufferSize, leaveOpen: true))
-            {
-                int bytesRead = await reader.ReadAsync(buffer, 0, buffer.Length);
-                return await PartTwoAsync(buffer.AsMemory(0, bytesRead));
-            }
+            using StreamReader reader = new(input, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: bufferSize, leaveOpen: true);
+
+            int bytesRead = await reader.ReadAsync(buffer, 0, buffer.Length);
+
+            return await PartTwoAsync(buffer.AsMemory(0, bytesRead));
         }
         protected virtual Task<string> PartTwoAsync(ReadOnlyMemory<char> input)
         {

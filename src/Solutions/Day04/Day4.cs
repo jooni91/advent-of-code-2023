@@ -6,7 +6,7 @@ namespace AdventOfCode2023.Solutions.Day04
 {
     public class Day4 : DayBase
     {
-        protected override string Day { get; } = "04";
+        public override string Day { get; } = "04";
 
         protected override Task<string> PartOneAsync(ReadOnlyMemory<char> input)
         {
@@ -101,20 +101,20 @@ namespace AdventOfCode2023.Solutions.Day04
 
                 if (Flush(ref buffer, ref bufferIndex, out var res))
                 {
-                    results[resultIndex] = (int)res;
+                    results[resultIndex] = res;
                     resultIndex++;
                 }
             }
 
             if (Flush(ref buffer, ref bufferIndex, out var result))
             {
-                results[resultIndex] = (int)result;
+                results[resultIndex] = result;
                 resultIndex++;
             }
         }
-        private static bool Flush(ref Span<int?> buffer, ref int index, [NotNullWhen(true)] out int? result)
+        private static bool Flush(ref Span<int?> buffer, ref int index, [NotNullWhen(true)] out int result)
         {
-            result = null;
+            result = 0;
 
             if (index > -1)
             {
@@ -124,7 +124,7 @@ namespace AdventOfCode2023.Solutions.Day04
                 index = -1;
             }
 
-            return result != null;
+            return result > 0;
         }
     }
 }

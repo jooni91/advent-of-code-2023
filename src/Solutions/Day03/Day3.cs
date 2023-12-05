@@ -4,7 +4,7 @@ namespace AdventOfCode2023.Solutions.Day03
 {
     public class Day3 : DayBase
     {
-        protected override string Day { get; } = "03";
+        public override string Day { get; } = "03";
 
         protected override async Task<string> PartOneAsync(FileStream inputStream)
         {

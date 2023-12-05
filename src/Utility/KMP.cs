@@ -4,10 +4,12 @@
     {
         public static List<int> SearchAllIndexes(string source, string match)
         {
-            List<int> indices = new List<int>();
+            List<int> indices = [];
             int sourceIndex = 0;
             int matchIndex = 0;
-            int[] failure = ComputeFailure(match);
+            Span<int> failure = stackalloc int[match.Length];
+
+            ComputeFailure(match, ref failure);
 
             while (sourceIndex < source.Length)
             {
@@ -35,10 +37,12 @@
         }
         public static List<int> SearchAllIndieces(ReadOnlySpan<char> source, ReadOnlySpan<char> match)
         {
-            List<int> indices = new();
+            List<int> indices = [];
             int sourceIndex = 0;
             int matchIndex = 0;
-            int[] failure = ComputeFailure(match);
+            Span<int> failure = stackalloc int[match.Length];
+
+            ComputeFailure(match, ref failure);
 
             while (sourceIndex < source.Length)
             {
@@ -69,31 +73,61 @@
             return SearchAllIndieces(source, delimiter.ToString().AsSpan());
         }
 
-        private static int[] ComputeFailure(ReadOnlySpan<char> pattern)
+        public static int SearchAllIndieces(ReadOnlySpan<char> source, ReadOnlySpan<char> match, ref Span<int> buffer)
         {
-            int[] failure = new int[pattern.Length];
-            int j = 0;
+            int sourceIndex = 0;
+            int matchIndex = 0;
+            int found = 0;
+            Span<int> failure = stackalloc int[match.Length];
 
-            for (int i = 1; i < pattern.Length; i++)
+            ComputeFailure(match, ref failure);
+
+            while (sourceIndex < source.Length)
             {
-                while (j > 0 && pattern[i] != pattern[j])
+                if (matchIndex < match.Length && match[matchIndex] == source[sourceIndex])
                 {
-                    j = failure[j - 1];
+                    matchIndex++;
+                    if (matchIndex == match.Length)
+                    {
+                        buffer[found] = sourceIndex - match.Length + 1;
+                        matchIndex = failure[matchIndex - 1];
+                        found++;
+                    }
+                    sourceIndex++;
                 }
-
-                if (pattern[i] == pattern[j])
+                else if (matchIndex > 0)
                 {
-                    j++;
+                    matchIndex = failure[matchIndex - 1];
                 }
-
-                failure[i] = j;
+                else
+                {
+                    sourceIndex++;
+                }
             }
 
-            return failure;
+            return found;
         }
-        private static int[] ComputeFailure(string pattern)
+        public static int SearchAllIndieces(ReadOnlySpan<char> source, char delimiter, ref Span<int> buffer)
         {
-            int[] failure = new int[pattern.Length];
+            int index = 0;
+            int found = 0;
+
+            while (index < source.Length)
+            {
+                if (delimiter == source[index])
+                {
+                        buffer[found] = index;
+                        found++;
+                }
+
+                index++;
+            }
+
+            return found;
+        }
+
+        private static void ComputeFailure(ReadOnlySpan<char> pattern, ref Span<int> failure)
+        {
             int j = 0;
 
             for (int i = 1; i < pattern.Length; i++)
@@ -110,8 +144,25 @@
 
                 failure[i] = j;
             }
+        }
+        private static void ComputeFailure(string pattern, ref Span<int> failure)
+        {
+            int j = 0;
 
-            return failure;
+            for (int i = 1; i < pattern.Length; i++)
+            {
+                while (j > 0 && pattern[i] != pattern[j])
+                {
+                    j = failure[j - 1];
+                }
+
+                if (pattern[i] == pattern[j])
+                {
+                    j++;
+                }
+
+                failure[i] = j;
+            }
         }
     }
 }

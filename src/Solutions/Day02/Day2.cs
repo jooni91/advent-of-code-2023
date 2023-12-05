@@ -1,5 +1,4 @@
-﻿using AdventOfCode2023.Extensions;
-using AdventOfCode2023.Utility;
+﻿using AdventOfCode2023.Utility;
 
 namespace AdventOfCode2023.Solutions.Day02
 {
@@ -12,58 +11,58 @@ namespace AdventOfCode2023.Solutions.Day02
             { "blue", 14 }
         };
 
-        protected override string Day { get; } = "02";
+        public override string Day { get; } = "02";
 
-        protected override async Task<string> PartOneAsync(FileStream inputStream)
+        protected override Task<string> PartOneAsync(ReadOnlyMemory<char> input)
         {
-            var sum = await GetValidGameNumbersAsync(inputStream.ReadLineAsync()).SumAsync();
+            int sum = 0;
 
-            return sum.ToString();
-        }
-        protected override async Task<string> PartTwoAsync(FileStream inputStream)
-        {
-            var sum = await PowerOfGamesAsync(inputStream.ReadLineAsync()).SumAsync();
-
-            return sum.ToString();
-        }
-
-        public async IAsyncEnumerable<int> GetValidGameNumbersAsync(IAsyncEnumerable<string> lines)
-        {
-            await foreach (var line in lines)
+            foreach (var line in new MemoryLineEnumerator(input))
             {
-                var validity = CheckValidity(line);
+                var validity = CheckValidity(line.Span);
 
                 if (validity.Valid)
                 {
-                    yield return validity.GameNumber;
+                    sum += validity.GameNumber;
                 }
             }
+
+            return Task.FromResult(sum.ToString());
         }
-        public async IAsyncEnumerable<int> PowerOfGamesAsync(IAsyncEnumerable<string> lines)
+        protected override Task<string> PartTwoAsync(ReadOnlyMemory<char> input)
         {
-            await foreach (var line in lines)
+            int sum = 0;
+
+            foreach (var line in new MemoryLineEnumerator(input))
             {
-                yield return GetPowerOfGame(line);
+                sum += GetPowerOfGame(line.Span);
             }
+
+            return Task.FromResult(sum.ToString());
         }
 
-        public (bool Valid, int GameNumber) CheckValidity(string line)
+        private (bool Valid, int GameNumber) CheckValidity(ReadOnlySpan<char> lineSpan)
         {
-            var lineSpan = line.AsSpan();
             var colonIndex = lineSpan.IndexOf(':');
             var gameDataSpan = lineSpan[(colonIndex + 1)..];
-            var semicolonIndieces = KMP.SearchAllIndieces(gameDataSpan, ";");
-            semicolonIndieces.Add(gameDataSpan.Length);
+
+            Span<int> semicolonIndieces = stackalloc int[64];
+            var semicolonIndiecesCount = KMP.SearchAllIndieces(gameDataSpan, ';', ref semicolonIndieces);
+            semicolonIndieces[semicolonIndiecesCount] = gameDataSpan.Length;
+            semicolonIndiecesCount++;
+
+            Span<int> commaIndieces = stackalloc int[3];
+            int foundCommas = 0;
 
             var drawStartIndex = 1;
 
-            foreach (var drawEndIndex in semicolonIndieces)
+            for (int index = 0; index < semicolonIndiecesCount; index++)
             {
-                var drawSpan = gameDataSpan[drawStartIndex..drawEndIndex];
-                var commaIndieces = KMP.SearchAllIndieces(drawSpan, ',');
-                commaIndieces.Add(drawSpan.Length);
+                var drawSpan = gameDataSpan[drawStartIndex..semicolonIndieces[index]];
+                foundCommas = KMP.SearchAllIndieces(drawSpan, ',', ref commaIndieces);
+                commaIndieces[foundCommas] = drawSpan.Length;
 
-                for (int i = 0; i < commaIndieces.Count; i++)
+                for (int i = 0; i <= foundCommas; i++)
                 {
                     var cubeSpan = drawSpan[(i > 0 ? commaIndieces[i - 1] + 2 : 0)..commaIndieces[i]];
                     var wsIndex = cubeSpan.IndexOf(' ');
@@ -83,18 +82,23 @@ namespace AdventOfCode2023.Solutions.Day02
                     }
                 }
 
-                drawStartIndex = drawEndIndex + 2;
+                drawStartIndex = semicolonIndieces[index] + 2;
             }
 
             return (true, int.Parse(lineSpan[4..colonIndex]));
         }
-        public int GetPowerOfGame(string line)
+        private static int GetPowerOfGame(ReadOnlySpan<char> lineSpan)
         {
-            var lineSpan = line.AsSpan();
             var colonIndex = lineSpan.IndexOf(':');
             var gameDataSpan = lineSpan[(colonIndex + 1)..];
-            var semicolonIndieces = KMP.SearchAllIndieces(gameDataSpan, ";");
-            semicolonIndieces.Add(gameDataSpan.Length);
+
+            Span<int> semicolonIndieces = stackalloc int[64];
+            var semicolonIndiecesCount = KMP.SearchAllIndieces(gameDataSpan, ';', ref semicolonIndieces);
+            semicolonIndieces[semicolonIndiecesCount] = gameDataSpan.Length;
+            semicolonIndiecesCount++;
+
+            Span<int> commaIndieces = stackalloc int[3];
+            int foundCommas = 0;
 
             int largestGreenCount = 0;
             int largestRedCount = 0;
@@ -102,13 +106,13 @@ namespace AdventOfCode2023.Solutions.Day02
 
             var drawStartIndex = 1;
 
-            foreach (var drawEndIndex in semicolonIndieces)
+            for (int index = 0; index < semicolonIndiecesCount; index++)
             {
-                var drawSpan = gameDataSpan[drawStartIndex..drawEndIndex];
-                var commaIndieces = KMP.SearchAllIndieces(drawSpan, ',');
-                commaIndieces.Add(drawSpan.Length);
+                var drawSpan = gameDataSpan[drawStartIndex..semicolonIndieces[index]];
+                foundCommas = KMP.SearchAllIndieces(drawSpan, ',', ref commaIndieces);
+                commaIndieces[foundCommas] = drawSpan.Length;
 
-                for (int i = 0; i < commaIndieces.Count; i++)
+                for (int i = 0; i <= foundCommas; i++)
                 {
                     var cubeSpan = drawSpan[(i > 0 ? commaIndieces[i - 1] + 2 : 0)..commaIndieces[i]];
                     var wsIndex = cubeSpan.IndexOf(' ');
@@ -138,7 +142,7 @@ namespace AdventOfCode2023.Solutions.Day02
                     }
                 }
 
-                drawStartIndex = drawEndIndex + 2;
+                drawStartIndex = semicolonIndieces[index] + 2;
             }
 
             return largestGreenCount * largestRedCount * largestBlueCount;

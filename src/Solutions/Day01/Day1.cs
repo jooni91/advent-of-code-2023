@@ -1,84 +1,117 @@
 ﻿using AdventOfCode2023.Extensions;
 using AdventOfCode2023.Utility;
-using System.Text;
 
 namespace AdventOfCode2023.Solutions.Day01
 {
     public class Day1 : DayBase
     {
-        private readonly Dictionary<string, string> replacementDictionary = new()
+        private readonly Dictionary<string, int> stringNumberMap = new()
         {
-            { "one", "1" },
-            { "two", "2" },
-            { "three", "3" },
-            { "four", "4" },
-            { "five", "5" },
-            { "six", "6" },
-            { "seven", "7" },
-            { "eight", "8" },
-            { "nine", "9" }
+            { "one", 1 },
+            { "two", 2 },
+            { "three", 3 },
+            { "four", 4 },
+            { "five", 5 },
+            { "six", 6 },
+            { "seven", 7 },
+            { "eight", 8 },
+            { "nine", 9 }
+        };
+        private readonly Dictionary<char, int> charNumberMap = new()
+        {
+            { '1', 1 },
+            { '2', 2 },
+            { '3', 3 },
+            { '4', 4 },
+            { '5', 5 },
+            { '6', 6 },
+            { '7', 7 },
+            { '8', 8 },
+            { '9', 9 }
         };
 
-        protected override string Day => "01";
+        public override string Day => "01";
 
-        protected override async Task<string> PartOneAsync(FileStream inputStream)
+        protected override Task<string> PartOneAsync(ReadOnlyMemory<char> input)
         {
-            var result = await ExtractTwoDigitNumberAsync(inputStream.ReadLineAsync()).SumAsync();
-
-            return result.ToString();
+            return Task.FromResult(ExtractTwoDigitNumber(input).ToString());
         }
-        protected override async Task<string> PartTwoAsync(FileStream inputStream)
+        protected override Task<string> PartTwoAsync(ReadOnlyMemory<char> input)
         {
-            var result = await ExtractTwoDigitNumberAsync(ReplaceWrittenNumbers(inputStream.ReadLineAsync())).SumAsync();
-
-            return result.ToString();
+            return Task.FromResult(ExtractTwoDigitNumberWithWrittenDigits(input).ToString());
         }
 
-        private async IAsyncEnumerable<int> ExtractTwoDigitNumberAsync(IAsyncEnumerable<string> lines)
+        private int ExtractTwoDigitNumber(ReadOnlyMemory<char> input)
         {
-            var digits = new char[] { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+            int sum = 0;
 
-            await foreach (var line in lines)
+            Span<char> digits = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
+            foreach (var line in new MemoryLineEnumerator(input))
             {
-                var firstIndex = line.AsSpan().IndexOfAny(digits);
-                var lastIndex = line.AsSpan().LastIndexOfAny(digits);
+                var firstIndex = line.Span.IndexOfAny(digits);
+                var lastIndex = line.Span.LastIndexOfAny(digits);
 
-                yield return int.Parse(string.Create(2, line, (span, input) => 
-                {
-                    span[0] = line[firstIndex];
-                    span[1] = line[lastIndex];
-                }));
+                sum += (int)charNumberMap[line.Span[firstIndex]].Concat(charNumberMap[line.Span[lastIndex]]);
             }
+
+            return sum;
         }
-        private async IAsyncEnumerable<string> ReplaceWrittenNumbers(IAsyncEnumerable<string> lines)
+        private int ExtractTwoDigitNumberWithWrittenDigits(ReadOnlyMemory<char> input)
         {
-            var writtenDigits = new string[] { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
-            var replacements = new List<(int Index, string Replacement)>();
+            int sum = 0;
 
-            await foreach (var line in lines)
+            Span<char> digits = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+            Span<string> writtenDigits = [ "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" ];
+
+            Span<int> letterIndieces = stackalloc int[4];
+            int letterCount = 0;
+
+            foreach (var line in new MemoryLineEnumerator(input))
             {
-                var result = new StringBuilder(line);
-                replacements.Clear();
+                int min = input.Length;
+                int minVal = 0;
+                int max = -1;
+                int maxVal = 0;
 
-                foreach (var substring in writtenDigits)
+                var firstIndex = line.Span.IndexOfAny(digits);
+                var lastIndex = line.Span.LastIndexOfAny(digits);
+
+                if (firstIndex > -1 && min > firstIndex)
                 {
-                    var indexes = KMP.SearchAllIndexes(line, substring);
+                    min = firstIndex;
+                    minVal = charNumberMap[line.Span[firstIndex]];
+                }
 
-                    foreach (var index in indexes)
+                if (lastIndex > -1 && max < lastIndex)
+                {
+                    max = lastIndex;
+                    maxVal = charNumberMap[line.Span[lastIndex]];
+                }
+
+                for (int i = 0; i < writtenDigits.Length; i++)
+                {
+                    letterCount = KMP.SearchAllIndieces(line.Span, writtenDigits[i].AsSpan(), ref letterIndieces);
+
+                    for (int j = 0; j < letterCount; j++)
                     {
-                        replacements.Add((index, replacementDictionary[substring]));
+                        if (min > letterIndieces[j])
+                        {
+                            min = letterIndieces[j];
+                            minVal = stringNumberMap[writtenDigits[i]];
+                        }
+                        if (max < letterIndieces[j])
+                        {
+                            max = letterIndieces[j];
+                            maxVal = stringNumberMap[writtenDigits[i]];
+                        }
                     }
                 }
 
-                // Apply replacements in reverse order to avoid index shifting
-                foreach (var (index, replacement) in replacements.OrderByDescending(r => r.Index))
-                {
-                    result.Remove(index, replacement.Length);
-                    result.Insert(index, replacement);
-                }
-
-                yield return result.ToString();
+                sum += (int)minVal.Concat(maxVal);
             }
+
+            return sum;
         }
     }
 }
