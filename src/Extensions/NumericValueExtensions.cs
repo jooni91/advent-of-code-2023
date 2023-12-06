@@ -32,5 +32,23 @@
             if (b < 100000000U) return 100000000L * a + b;
             return 1000000000L * a + b;
         }
+
+        public static long Concat(this long a, long b)
+        {
+            if (a < 0 || b < 0)
+            {
+                throw new ArgumentException();
+            }
+
+            if (b < 10L) return 10L * a + b;
+            if (b < 100L) return 100L * a + b;
+            if (b < 1000L) return 1000L * a + b;
+            if (b < 10000L) return 10000L * a + b;
+            if (b < 100000L) return 100000L * a + b;
+            if (b < 1000000L) return 1000000L * a + b;
+            if (b < 10000000L) return 10000000L * a + b;
+            if (b < 100000000L) return 100000000L * a + b;
+            return 1000000000L * a + b;
+        }
     }
 }
